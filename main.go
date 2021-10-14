@@ -2,21 +2,19 @@ package main
 
 import (
 	"fmt"
-	"log"
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 	"net/http"
-	"os"
-	"time"
 )
 
-func handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Poor day --> %s", time.Now().Format("01-02-2006"))
-}
-
 func main() {
-	http.HandleFunc("/", handler)
-	PORT := os.Getenv("PORT")
-	if len(PORT) == 0 {
-		PORT = "8080"
+	router := gin.Default()
+	router.Use(cors.Default())
+	router.GET("/", func(c *gin.Context) {
+		c.String(http.StatusOK, "Cheers!")
+	})
+	err := router.Run()
+	if err != nil {
+		println(fmt.Errorf("%s", "Could not start the server."))
 	}
-	log.Fatal(http.ListenAndServe(":"+PORT, nil))
 }
