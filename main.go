@@ -1,10 +1,11 @@
 package main
 
 import (
-	"fmt"
+	"log"
+	"net/http"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 func main() {
@@ -13,8 +14,11 @@ func main() {
 	router.GET("/", func(c *gin.Context) {
 		c.String(http.StatusOK, "Cheers!")
 	})
+	router.GET("/healthcheck", func(c *gin.Context) {
+		c.JSON(http.StatusOK, struct{ Status string }{"Operational"})
+	})
 	err := router.Run()
 	if err != nil {
-		println(fmt.Errorf("%s", "Could not start the server."))
+		log.Fatalln("Could not start the server:", err)
 	}
 }
