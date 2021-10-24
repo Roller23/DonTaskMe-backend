@@ -2,6 +2,9 @@
 .idea/
 serv.iml
 
+#Enviorement
+.env
+
 # Binaries for programs and plugins
 *.exe
 *.exe~
