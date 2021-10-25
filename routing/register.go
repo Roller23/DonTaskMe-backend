@@ -33,7 +33,7 @@ func register(c *gin.Context) {
 	//	)
 	//}
 
-	_, err := bcrypt.GenerateFromPassword([]byte(ld.Password), 20)
+	_, err := bcrypt.GenerateFromPassword([]byte(ld.Password), 9)
 	if err != nil {
 		c.JSON(http.StatusNotAcceptable, err.Error())
 		return
