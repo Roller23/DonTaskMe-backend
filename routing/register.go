@@ -1,11 +1,12 @@
 package routing
 
 import (
-	"github.com/gin-gonic/gin"
-	"golang.org/x/crypto/bcrypt"
 	"log"
 	"net/http"
 	"regexp"
+
+	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type loginData struct {
@@ -40,6 +41,7 @@ func register(c *gin.Context) {
 
 	//TODO: Save to DB
 	c.Status(http.StatusCreated)
+	c.Done()
 }
 
 //TODO: Fix the regexp
