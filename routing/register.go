@@ -40,8 +40,7 @@ func register(c *gin.Context) {
 	}
 
 	//TODO: Save to DB
-	c.Status(http.StatusCreated)
-	c.Done()
+	c.JSON(http.StatusCreated, struct{ Message string }{"Success"})
 }
 
 //TODO: Fix the regexp
