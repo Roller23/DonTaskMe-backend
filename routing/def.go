@@ -11,7 +11,7 @@ func GetServer(mode string) *gin.Engine {
 	router.Use(cors.Default())
 
 	//Set up routes here
-	router.GET("/", homeHandler)
+	router.GET("/health-check", healthCheckHandler)
 
 	return router
 }

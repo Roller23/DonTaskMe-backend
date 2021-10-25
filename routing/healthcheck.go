@@ -5,6 +5,6 @@ import (
 	"net/http"
 )
 
-func homeHandler(c *gin.Context) {
+func healthCheckHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, struct{ Status string }{"Operational"})
 }

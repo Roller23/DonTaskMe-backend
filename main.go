@@ -28,7 +28,7 @@ func main() {
 
 	err = client.Connect(ctx)
 	if err != nil {
-		log.Fatalln("Could not disconnect from mongoDB: ", err)
+		log.Fatalln("Couldn't disconnect from mongoDB: ", err)
 	}
 
 	defer func(client *mongo.Client, ctx context.Context) {
