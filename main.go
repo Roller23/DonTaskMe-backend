@@ -3,19 +3,17 @@ package main
 import (
 	"DonTaskMe-backend/routing"
 	"context"
-	"github.com/joho/godotenv"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"os"
 	"time"
+
+	"github.com/joho/godotenv"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatalln("Couldn't load .env:", err)
-	}
+	godotenv.Load()
 
 	mongoURI := os.Getenv("ATLAS_URI")
 	client, err := mongo.NewClient(options.Client().ApplyURI(mongoURI))
