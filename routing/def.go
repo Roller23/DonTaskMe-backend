@@ -12,6 +12,6 @@ func GetServer(mode string) *gin.Engine {
 
 	//Set up routes here
 	router.GET("/health-check", healthCheckHandler)
-
+	router.POST("/register", register)
 	return router
 }
