@@ -1,31 +1,31 @@
 package routing
 
 import (
+	"DonTaskMe-backend/internal/db"
+	"DonTaskMe-backend/internal/models"
+	"DonTaskMe-backend/pkg/hash"
+	"context"
+	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 	"log"
 	"net/http"
 	"regexp"
-
-	"github.com/gin-gonic/gin"
-	"golang.org/x/crypto/bcrypt"
 )
 
-type loginData struct {
-	Nickname string `json:"nickname"`
-	Password string `json:"password"`
-}
-
-type errorMsg struct {
-	Message string `json:"message"`
-}
-
 func register(c *gin.Context) {
-	var ld loginData
-	if err := c.ShouldBindJSON(&ld); err != nil {
+	var user models.User
+	if err := c.ShouldBindJSON(&user); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
-	//TODO: check if user exists
+	if userAlreadyExists(&user.Username) {
+		c.JSON(http.StatusConflict, "user with given username already exists")
+		return
+	}
+
+	//TODO: validate password
 	//if !isPasswordValid(ld.Password) {
 	//	c.JSON(
 	//		http.StatusNotAcceptable,
@@ -33,14 +33,16 @@ func register(c *gin.Context) {
 	//	)
 	//}
 
-	_, err := bcrypt.GenerateFromPassword([]byte(ld.Password), 9)
+	hashedPassword, err := hash.Generate(&user.Password)
 	if err != nil {
 		c.JSON(http.StatusNotAcceptable, err.Error())
 		return
 	}
+	user.Password = hashedPassword
 
-	//TODO: Save to DB
-	c.JSON(http.StatusCreated, struct{ Message string }{"Success"})
+	usersCollection := db.Client.Database(db.Name).Collection(db.UsersCollectionName)
+	_, err = usersCollection.InsertOne(context.TODO(), user)
+	c.Status(http.StatusCreated)
 }
 
 //TODO: Fix the regexp
@@ -50,4 +52,11 @@ func isPasswordValid(password string) bool {
 		log.Fatalln("Regexp did not compile: ", err.Error())
 	}
 	return exp.Match([]byte(password))
+}
+
+func userAlreadyExists(username *string) bool {
+	var res models.User
+	usersCollection := db.Client.Database(db.Name).Collection(db.UsersCollectionName)
+	err := usersCollection.FindOne(context.TODO(), bson.M{"username": username}).Decode(&res)
+	return err != mongo.ErrNoDocuments
 }
