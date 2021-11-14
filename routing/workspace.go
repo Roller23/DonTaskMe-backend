@@ -28,7 +28,7 @@ func getWorkspaces(c *gin.Context) {
 		return
 	}
 
-	var workspaces []models.Workspace
+	workspaces := make([]models.Workspace, 0)
 	cursor, err := wh.Find(context.TODO(), bson.M{"labradors": bson.M{"$in": []string{*user.Uid}}})
 	if err != nil {
 		log.Println(err.Error())
