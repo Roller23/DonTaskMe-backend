@@ -1,26 +1,28 @@
 package main
 
 import (
-	"DonTaskMe-backend/graph"
-	"DonTaskMe-backend/graph/generated"
-	"DonTaskMe-backend/internal/db"
-	"github.com/99designs/gqlgen/graphql/handler"
-	"github.com/99designs/gqlgen/graphql/playground"
+	db2 "DonTaskMe-backend/internal/db"
+	"DonTaskMe-backend/routing"
 	"github.com/joho/godotenv"
 	"log"
-	"net/http"
 	"os"
 )
 
 func main() {
 	_ = godotenv.Load()
-	port := os.Getenv("PORT")
-	db.InitDb()
-	defer db.Disconnect()
-	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
+	db2.InitDb()
+	defer db2.Disconnect()
 
-	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	http.Handle("/query", srv)
-	log.Printf("GraphiQL http://localhost:%s/", port)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	var mode string
+	if len(os.Args) > 1 && os.Args[1] == "--prod" {
+		mode = "release"
+	} else {
+		mode = "debug"
+	}
+
+	server := routing.GetServer(mode)
+	err := server.Run()
+	if err != nil {
+		log.Fatalln("Couldn't start the server: ", err)
+	}
 }
