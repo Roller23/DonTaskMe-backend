@@ -1,8 +1,8 @@
 package routing
 
 import (
-	db2 "DonTaskMe-backend/internal/db"
-	models2 "DonTaskMe-backend/internal/models"
+	"DonTaskMe-backend/internal/db"
+	"DonTaskMe-backend/internal/models"
 	"DonTaskMe-backend/pkg/hash"
 	"context"
 	"github.com/gin-gonic/gin"
@@ -15,7 +15,7 @@ import (
 )
 
 func register(c *gin.Context) {
-	var user models2.User
+	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
@@ -40,7 +40,7 @@ func register(c *gin.Context) {
 	}
 	user.Password = hashedPassword
 
-	usersCollection := db2.Client.Database(os.Getenv("DB_NAME")).Collection(os.Getenv("USERS_COLLECTION"))
+	usersCollection := db.Client.Database(os.Getenv("DB_NAME")).Collection(os.Getenv("USERS_COLLECTION"))
 	_, err = usersCollection.InsertOne(context.TODO(), user)
 	c.Status(http.StatusCreated)
 }
@@ -55,8 +55,8 @@ func isPasswordValid(password string) bool {
 }
 
 func userAlreadyExists(username *string) bool {
-	var res models2.User
-	usersCollection := db2.Client.Database(os.Getenv("DB_NAME")).Collection(os.Getenv("USERS_COLLECTION"))
+	var res models.User
+	usersCollection := db.Client.Database(os.Getenv("DB_NAME")).Collection(os.Getenv("USERS_COLLECTION"))
 	err := usersCollection.FindOne(context.TODO(), bson.M{"username": username}).Decode(&res)
 	return err != mongo.ErrNoDocuments
 }
