@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	nano "github.com/matoous/go-nanoid"
 	"go.mongodb.org/mongo-driver/bson"
+	"log"
 	"net/http"
 )
 
@@ -57,5 +58,6 @@ func assignNewToken(user *models.User) error {
 	user.Token = &uid
 	usersCollection := db.Handler.Collection(db.UsersCollectionName)
 	_, err := usersCollection.UpdateOne(context.TODO(), bson.M{"uid": user.Uid}, user)
+	log.Println(err)
 	return err
 }
