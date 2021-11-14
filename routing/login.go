@@ -57,7 +57,7 @@ func assignNewToken(user *models.User) error {
 	uid, _ := nano.Nanoid()
 	user.Token = &uid
 	usersCollection := db.Handler.Collection(db.UsersCollectionName)
-	_, err := usersCollection.UpdateOne(context.TODO(), bson.M{"uid": user.Uid}, user)
+	_, err := usersCollection.UpdateOne(context.TODO(), bson.M{"uid": user.Uid}, bson.D{{"$set", bson.D{{"token", user.Token}}}})
 	log.Println(err)
 	return err
 }
