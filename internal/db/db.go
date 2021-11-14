@@ -9,6 +9,11 @@ import (
 	"time"
 )
 
+const (
+	Name                = "myFirstDatabase"
+	UsersCollectionName = "users"
+)
+
 var (
 	Client *mongo.Client
 )

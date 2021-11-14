@@ -10,7 +10,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"log"
 	"net/http"
-	"os"
 	"regexp"
 )
 
@@ -26,6 +25,7 @@ func register(c *gin.Context) {
 		return
 	}
 
+	//TODO: validate password
 	//if !isPasswordValid(ld.Password) {
 	//	c.JSON(
 	//		http.StatusNotAcceptable,
@@ -40,7 +40,7 @@ func register(c *gin.Context) {
 	}
 	user.Password = hashedPassword
 
-	usersCollection := db.Client.Database(os.Getenv("DB_NAME")).Collection(os.Getenv("USERS_COLLECTION"))
+	usersCollection := db.Client.Database(db.Name).Collection(db.UsersCollectionName)
 	_, err = usersCollection.InsertOne(context.TODO(), user)
 	c.Status(http.StatusCreated)
 }
@@ -56,7 +56,7 @@ func isPasswordValid(password string) bool {
 
 func userAlreadyExists(username *string) bool {
 	var res models.User
-	usersCollection := db.Client.Database(os.Getenv("DB_NAME")).Collection(os.Getenv("USERS_COLLECTION"))
+	usersCollection := db.Client.Database(db.Name).Collection(db.UsersCollectionName)
 	err := usersCollection.FindOne(context.TODO(), bson.M{"username": username}).Decode(&res)
 	return err != mongo.ErrNoDocuments
 }

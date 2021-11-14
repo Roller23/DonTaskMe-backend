@@ -8,7 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"net/http"
-	"os"
 )
 
 func login(c *gin.Context) {
@@ -34,7 +33,7 @@ func login(c *gin.Context) {
 
 func findUser(username *string) (*models.User, error) {
 	var res models.User
-	usersCollection := db.Client.Database(os.Getenv("DB_NAME")).Collection(os.Getenv("USERS_COLLECTION"))
+	usersCollection := db.Client.Database(db.Name).Collection(db.UsersCollectionName)
 	err := usersCollection.FindOne(context.TODO(), bson.M{"username": username}).Decode(&res)
 	if err != nil {
 		return nil, err
