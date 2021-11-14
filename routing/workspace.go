@@ -36,7 +36,7 @@ func getWorkspaces(c *gin.Context) {
 		return
 	}
 
-	err = cursor.All(context.TODO(), workspaces)
+	err = cursor.All(context.TODO(), &workspaces)
 	if err != nil {
 		log.Println(err.Error())
 		c.JSON(http.StatusInternalServerError, err.Error())
