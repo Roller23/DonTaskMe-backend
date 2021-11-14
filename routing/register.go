@@ -6,6 +6,7 @@ import (
 	"DonTaskMe-backend/pkg/hash"
 	"context"
 	"github.com/gin-gonic/gin"
+	nano "github.com/matoous/go-nanoid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"log"
@@ -39,6 +40,13 @@ func register(c *gin.Context) {
 		return
 	}
 	user.Password = hashedPassword
+
+	uid, err := nano.Nanoid()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, "")
+		return
+	}
+	user.Uid = &uid
 
 	usersCollection := db.Client.Database(db.Name).Collection(db.UsersCollectionName)
 	_, err = usersCollection.InsertOne(context.TODO(), user)

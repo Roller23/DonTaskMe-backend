@@ -10,12 +10,14 @@ import (
 )
 
 const (
-	Name                = "myFirstDatabase"
-	UsersCollectionName = "users"
+	Name                    = "myFirstDatabase"
+	UsersCollectionName     = "users"
+	WorkspaceCollectionName = "workspace"
 )
 
 var (
-	Client *mongo.Client
+	Client  *mongo.Client
+	Handler *mongo.Database
 )
 
 func InitDb() {
@@ -37,6 +39,7 @@ func InitDb() {
 
 	log.Println("Database connection established!")
 	Client = client
+	Handler = client.Database(Name)
 }
 
 func Disconnect() {
