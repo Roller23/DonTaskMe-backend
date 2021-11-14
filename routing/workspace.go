@@ -6,6 +6,7 @@ import (
 	"context"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
+	"log"
 	"net/http"
 )
 
@@ -14,7 +15,7 @@ type WorkspacesRequest struct {
 }
 
 func getWorkspaces(c *gin.Context) {
-	workspacesHandler := db.Handler.Collection(db.WorkspaceCollectionName)
+	wh := db.Handler.Collection(db.WorkspaceCollectionName)
 	var token WorkspacesRequest
 	if err := c.ShouldBindJSON(&token); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
@@ -28,19 +29,26 @@ func getWorkspaces(c *gin.Context) {
 	}
 
 	var workspaces []models.Workspace
-	cursor, err := workspacesHandler.Find(context.TODO(), bson.M{"labradors": bson.M{"$in": []string{*user.Uid}}})
+	cursor, err := wh.Find(context.TODO(), bson.M{"labradors": bson.M{"$in": []string{*user.Uid}}})
 	if err != nil {
+		log.Println(err.Error())
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	err = cursor.All(context.TODO(), workspaces)
 	if err != nil {
+		log.Println(err.Error())
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	c.JSON(http.StatusOK, workspaces)
+}
+
+func addWorkspace(c *gin.Context) {
+	//wh := db.Handler.Collection(db.WorkspaceCollectionName)
+
 }
 
 func findUserByID(token string) (*models.User, error) {
