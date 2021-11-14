@@ -12,7 +12,7 @@ import (
 const (
 	Name                    = "myFirstDatabase"
 	UsersCollectionName     = "users"
-	WorkspaceCollectionName = "workspace"
+	WorkspaceCollectionName = "workspaces"
 )
 
 var (
