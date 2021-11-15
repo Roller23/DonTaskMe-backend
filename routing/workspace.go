@@ -7,6 +7,7 @@ import (
 	"context"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 	"log"
 	"net/http"
 )
@@ -47,23 +48,31 @@ func addWorkspace(c *gin.Context) {
 	}
 
 	user, err := helpers.FindUserByToken(workspaceReq.Token)
-	if err != nil {
-		c.JSON(http.StatusNotAcceptable, "access denied")
+	if err == mongo.ErrNoDocuments {
+		c.JSON(http.StatusExpectationFailed, err)
+		return
+	} else if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
 
-	wh := service.DB.Collection(service.WorkspaceCollectionName)
-	newWorkspace := model.Workspace{
-		Title:     workspaceReq.Title,
-		Desc:      workspaceReq.Desc,
-		Boards:    workspaceReq.Boards,
-		Labradors: append(workspaceReq.Labradors, *user.Uid),
-	}
-
-	_, err = wh.InsertOne(context.TODO(), newWorkspace)
+	err = workspaceReq.Save(*user.Uid)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
+
 	c.Status(http.StatusCreated)
+}
+
+func deleteWorkspace(c *gin.Context) {
+	UID := c.Param("uid")
+	err := model.Delete(UID)
+	if err == helpers.ResourceNotFound {
+		c.JSON(http.StatusBadRequest, err)
+	} else if err != nil {
+		c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	//TODO: send just status
+	c.JSON(http.StatusAccepted, "")
 }

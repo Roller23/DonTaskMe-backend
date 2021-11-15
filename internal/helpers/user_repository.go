@@ -22,10 +22,7 @@ func FindUserByToken(token string) (*model.User, error) {
 	var res model.User
 	usersCollection := service.DB.Collection(service.UsersCollectionName)
 	err := usersCollection.FindOne(context.TODO(), bson.M{"token": token}).Decode(&res)
-	if err != nil {
-		return nil, err
-	}
-	return &res, nil
+	return &res, err
 }
 
 func UserAlreadyExists(username *string) bool {
