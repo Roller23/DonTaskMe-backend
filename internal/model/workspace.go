@@ -1,9 +1,9 @@
 package model
 
 import (
-	"DonTaskMe-backend/internal/helpers"
 	"DonTaskMe-backend/internal/service"
 	"context"
+	"errors"
 	nano "github.com/matoous/go-nanoid"
 	"go.mongodb.org/mongo-driver/bson"
 )
@@ -24,6 +24,10 @@ type Workspace struct {
 	Owner     string   `json:"owner"`
 	Labradors []string `json:"labradors"` //users ID
 }
+
+var (
+	ResourceNotFound = errors.New("no such resource")
+)
 
 func (w *WorkspaceRequest) Save(ownerUID string) error {
 	UID, _ := nano.Nanoid()
@@ -47,7 +51,7 @@ func Delete(workspaceUID string) error {
 	if err != nil {
 		return err
 	} else if res.DeletedCount == 0 {
-		return helpers.ResourceNotFound
+		return ResourceNotFound
 	}
 	return nil
 }

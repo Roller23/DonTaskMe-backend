@@ -65,10 +65,14 @@ func addWorkspace(c *gin.Context) {
 	c.Status(http.StatusCreated)
 }
 
+func updateWorkspace(c *gin.Context) {
+	panic("Not implemented yet!")
+}
+
 func deleteWorkspace(c *gin.Context) {
 	UID := c.Param("uid")
 	err := model.Delete(UID)
-	if err == helpers.ResourceNotFound {
+	if err == model.ResourceNotFound {
 		c.JSON(http.StatusBadRequest, err)
 	} else if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())

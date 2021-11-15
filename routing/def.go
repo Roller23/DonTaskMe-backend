@@ -12,10 +12,19 @@ func GetServer(mode string) *gin.Engine {
 
 	//Set up routes here
 	router.GET("/health-check", healthCheckHandler)
+
 	router.POST("/register", register)
 	router.POST("/login", login)
+
 	router.GET("/workspaces", getWorkspaces)
 	router.POST("/workspaces", addWorkspace)
+	router.PATCH("/workspaces/:uid", updateWorkspace)
 	router.DELETE("/workspaces/:uid", deleteWorkspace)
+
+	router.GET("/boards", getBoards)
+	router.POST("/boards", addBoard)
+	router.PATCH("/boards/:uid", updateBoard)
+	router.DELETE("/boards/:uid", deleteBoard)
+
 	return router
 }
