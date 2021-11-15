@@ -1,4 +1,4 @@
-package models
+package model
 
 type Workspace struct {
 	Title     string   `json:"title"`

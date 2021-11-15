@@ -1,4 +1,4 @@
-package db
+package service
 
 import (
 	"context"
@@ -16,8 +16,8 @@ const (
 )
 
 var (
-	Client  *mongo.Client
-	Handler *mongo.Database
+	Client *mongo.Client
+	DB     *mongo.Database
 )
 
 func InitDb() {
@@ -39,7 +39,7 @@ func InitDb() {
 
 	log.Println("Database connection established!")
 	Client = client
-	Handler = client.Database(Name)
+	DB = client.Database(Name)
 }
 
 func Disconnect() {

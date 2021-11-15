@@ -1,8 +1,9 @@
 package routing
 
 import (
-	"DonTaskMe-backend/internal/db"
-	"DonTaskMe-backend/internal/models"
+	"DonTaskMe-backend/internal/helpers"
+	"DonTaskMe-backend/internal/model"
+	"DonTaskMe-backend/internal/service"
 	"context"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
@@ -10,25 +11,21 @@ import (
 	"net/http"
 )
 
-type WorkspacesRequest struct {
-	Token string `json:"token"`
-}
-
 func getWorkspaces(c *gin.Context) {
-	wh := db.Handler.Collection(db.WorkspaceCollectionName)
-	var token WorkspacesRequest
-	if err := c.ShouldBindJSON(&token); err != nil {
-		c.JSON(http.StatusBadRequest, err.Error())
+	token := c.Query("token")
+	if token == "" {
+		c.JSON(http.StatusExpectationFailed, "no token passed")
 		return
 	}
+	wh := service.DB.Collection(service.WorkspaceCollectionName)
 
-	user, err := findUserByID(token.Token)
+	user, err := helpers.FindUserByToken(token)
 	if err != nil {
 		c.JSON(http.StatusNotAcceptable, "user does not exists in database")
 		return
 	}
 
-	workspaces := make([]models.Workspace, 0)
+	workspaces := make([]model.Workspace, 0)
 	cursor, err := wh.Find(context.TODO(), bson.M{"labradors": bson.M{"$in": []string{*user.Uid}}})
 	if err != nil {
 		log.Println(err.Error())
@@ -47,16 +44,6 @@ func getWorkspaces(c *gin.Context) {
 }
 
 func addWorkspace(c *gin.Context) {
-	//wh := db.Handler.Collection(db.WorkspaceCollectionName)
+	//wh := db.DB.Collection(db.WorkspaceCollectionName)
 
-}
-
-func findUserByID(token string) (*models.User, error) {
-	var res models.User
-	usersCollection := db.Handler.Collection(db.UsersCollectionName)
-	err := usersCollection.FindOne(context.TODO(), bson.M{"token": token}).Decode(&res)
-	if err != nil {
-		return nil, err
-	}
-	return &res, nil
 }

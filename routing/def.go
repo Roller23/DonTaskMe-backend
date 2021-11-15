@@ -14,6 +14,6 @@ func GetServer(mode string) *gin.Engine {
 	router.GET("/health-check", healthCheckHandler)
 	router.POST("/register", register)
 	router.POST("/login", login)
-	router.POST("/workspaces", getWorkspaces) //TODO change to GET someday
+	router.GET("/workspaces", getWorkspaces)
 	return router
 }

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"DonTaskMe-backend/internal/db"
+	"DonTaskMe-backend/internal/service"
 	"DonTaskMe-backend/routing"
 	"github.com/joho/godotenv"
 	"log"
@@ -10,8 +10,8 @@ import (
 
 func main() {
 	_ = godotenv.Load()
-	db.InitDb()
-	defer db.Disconnect()
+	service.InitDb()
+	defer service.Disconnect()
 
 	var mode string
 	if len(os.Args) > 1 && os.Args[1] == "--prod" {
