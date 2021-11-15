@@ -37,12 +37,7 @@ func register(c *gin.Context) {
 		return
 	}
 	userReq.Password = hashedPassword
-
 	uid, err := nano.Nanoid()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, "")
-		return
-	}
 
 	newUser := model.User{
 		Uid:      &uid,
@@ -51,7 +46,10 @@ func register(c *gin.Context) {
 		Token:    nil,
 	}
 
-	usersCollection := service.Client.Database(service.Name).Collection(service.UsersCollectionName)
+	usersCollection := service.DB.Collection(service.UsersCollectionName)
 	_, err = usersCollection.InsertOne(context.TODO(), newUser)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err.Error())
+	}
 	c.Status(http.StatusCreated)
 }

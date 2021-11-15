@@ -15,5 +15,6 @@ func GetServer(mode string) *gin.Engine {
 	router.POST("/register", register)
 	router.POST("/login", login)
 	router.GET("/workspaces", getWorkspaces)
+	router.POST("/workspaces", addWorkspace)
 	return router
 }

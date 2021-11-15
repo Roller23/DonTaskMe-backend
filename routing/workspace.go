@@ -13,19 +13,14 @@ import (
 
 func getWorkspaces(c *gin.Context) {
 	token := c.Query("token")
-	if token == "" {
-		c.JSON(http.StatusExpectationFailed, "no token passed")
-		return
-	}
-	wh := service.DB.Collection(service.WorkspaceCollectionName)
-
 	user, err := helpers.FindUserByToken(token)
 	if err != nil {
-		c.JSON(http.StatusNotAcceptable, "user does not exists in database")
+		c.JSON(http.StatusNotAcceptable, "access denied")
 		return
 	}
 
 	workspaces := make([]model.Workspace, 0)
+	wh := service.DB.Collection(service.WorkspaceCollectionName)
 	cursor, err := wh.Find(context.TODO(), bson.M{"labradors": bson.M{"$in": []string{*user.Uid}}})
 	if err != nil {
 		log.Println(err.Error())
@@ -44,6 +39,31 @@ func getWorkspaces(c *gin.Context) {
 }
 
 func addWorkspace(c *gin.Context) {
-	//wh := db.DB.Collection(db.WorkspaceCollectionName)
+	var workspaceReq model.WorkspaceRequest
+	err := c.ShouldBindJSON(&workspaceReq)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
 
+	user, err := helpers.FindUserByToken(workspaceReq.Token)
+	if err != nil {
+		c.JSON(http.StatusNotAcceptable, "access denied")
+		return
+	}
+
+	wh := service.DB.Collection(service.WorkspaceCollectionName)
+	newWorkspace := model.Workspace{
+		Title:     workspaceReq.Title,
+		Desc:      workspaceReq.Desc,
+		Boards:    workspaceReq.Boards,
+		Labradors: append(workspaceReq.Labradors, *user.Uid),
+	}
+
+	_, err = wh.InsertOne(context.TODO(), newWorkspace)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+	c.Status(http.StatusCreated)
 }
