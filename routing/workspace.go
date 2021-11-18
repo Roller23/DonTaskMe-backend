@@ -5,11 +5,12 @@ import (
 	"DonTaskMe-backend/internal/model"
 	"DonTaskMe-backend/internal/service"
 	"context"
+	"log"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"log"
-	"net/http"
 )
 
 func getWorkspaces(c *gin.Context) {
@@ -56,13 +57,12 @@ func addWorkspace(c *gin.Context) {
 		return
 	}
 
-	err = workspaceReq.Save(*user.Uid)
+	workspace, err := workspaceReq.Save(*user.Uid)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
-
-	c.Status(http.StatusCreated)
+	c.JSON(http.StatusCreated, workspace)
 }
 
 func updateWorkspace(c *gin.Context) {

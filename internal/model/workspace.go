@@ -4,6 +4,7 @@ import (
 	"DonTaskMe-backend/internal/service"
 	"context"
 	"errors"
+
 	nano "github.com/matoous/go-nanoid"
 	"go.mongodb.org/mongo-driver/bson"
 )
@@ -29,20 +30,21 @@ var (
 	ResourceNotFound = errors.New("no such resource")
 )
 
-func (w *WorkspaceRequest) Save(ownerUID string) error {
+func (w *WorkspaceRequest) Save(ownerUID string) (*Workspace, error) {
 	UID, _ := nano.Nanoid()
+	labradors := []string{ownerUID}
 	newWorkspace := Workspace{
 		UID:       UID,
 		Title:     w.Title,
 		Desc:      w.Desc,
-		Boards:    w.Boards,
+		Boards:    []Board{},
 		Owner:     ownerUID,
-		Labradors: w.Labradors,
+		Labradors: labradors,
 	}
 
 	wh := service.DB.Collection(service.WorkspaceCollectionName)
 	_, err := wh.InsertOne(context.TODO(), newWorkspace)
-	return err
+	return &newWorkspace, err
 }
 
 func Delete(workspaceUID string) error {
