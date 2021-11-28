@@ -16,7 +16,7 @@ type List struct {
 	UID      string `json:"uid"`
 	Title    string `json:"title"`
 	Index    int    `json:"index"`
-	Card     []Card `json:"card"`
+	Cards    []Card `json:"card"`
 	BoardUID string `json:"boardUid"`
 }
 
@@ -25,7 +25,7 @@ func (l *ListReq) Save(c context.Context, boardUID string) (*List, error) {
 	newList := List{
 		UID:      UID,
 		Title:    l.Title,
-		Card:     []Card{},
+		Cards:    []Card{},
 		Index:    l.Index,
 		BoardUID: boardUID,
 	}
@@ -64,4 +64,14 @@ func DeleteList(c context.Context, listUID string) error {
 		return ResourceNotFound
 	}
 	return nil
+}
+
+func FindList(c context.Context, listUID string) (*List, error) {
+	wh := service.DB.Collection(service.ListCollectionName)
+	var list List
+	err := wh.FindOne(c, bson.D{{"uid", listUID}}).Decode(&list)
+	if err != nil {
+		return nil, err
+	}
+	return &list, nil
 }
