@@ -33,7 +33,7 @@ func getBoards(c *gin.Context) {
 
 func addBoard(c *gin.Context) {
 	token := c.Query("token")
-	_, err := helpers.FindUserByToken(token)
+	user, err := helpers.FindUserByToken(token)
 	if err == mongo.ErrNoDocuments {
 		c.JSON(http.StatusExpectationFailed, err)
 		return
@@ -58,6 +58,11 @@ func addBoard(c *gin.Context) {
 		return
 	}
 
+	if *user.Uid != workspace.Owner {
+		c.JSON(http.StatusExpectationFailed, "no owner privilege")
+		return
+	}
+
 	board, err := boardReq.Save(c, workspace.UID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
@@ -70,39 +75,39 @@ func updateBoard(c *gin.Context) {
 	panic("Not implemented yet!")
 }
 
-func deleteBoard(c *gin.Context) {
-	//		token := c.Query("token")
-	//	user, err := helpers.FindUserByToken(token)
-	//	if err == mongo.ErrNoDocuments {
-	//		c.JSON(http.StatusExpectationFailed, err)
-	//		return
-	//	} else if err != nil {
-	//		c.JSON(http.StatusInternalServerError, err)
-	//		return
-	//	}
-	//
-	//	workspaceUID := c.Param("uid")
-	//	wh := service.DB.Collection(service.WorkspaceCollectionName)
-	//
-	//	var workspace model.Workspace
-	//	err = wh.FindOne(c, bson.D{{"uid", workspaceUID}}).Decode(&workspace)
-	//	if err == mongo.ErrNoDocuments {
-	//		c.JSON(http.StatusBadRequest, "no such workspace")
-	//	} else if err != nil {
-	//		c.JSON(http.StatusInternalServerError, err.Error())
-	//	}
-	//
-	//	if workspace.Owner == *user.Uid {
-	//		err = model.Delete(c, workspaceUID)
-	//		if err == model.ResourceNotFound {
-	//			c.JSON(http.StatusBadRequest, err)
-	//		} else if err != nil {
-	//			c.JSON(http.StatusInternalServerError, err.Error())
-	//		}
-	//		//TODO: send just status
-	//		c.JSON(http.StatusAccepted, "")
-	//		return
-	//	}
-	//
-	//	c.JSON(http.StatusBadRequest, "no ownership")
-}
+//func deleteBoard(c *gin.Context) {
+//			token := c.Query("token")
+//		user, err := helpers.FindUserByToken(token)
+//		if err == mongo.ErrNoDocuments {
+//			c.JSON(http.StatusExpectationFailed, err)
+//			return
+//		} else if err != nil {
+//			c.JSON(http.StatusInternalServerError, err)
+//			return
+//		}
+//
+//		workspaceUID := c.Param("uid")
+//		wh := service.DB.Collection(service.WorkspaceCollectionName)
+//
+//		var workspace model.Workspace
+//		err = wh.FindOne(c, bson.D{{"uid", workspaceUID}}).Decode(&workspace)
+//		if err == mongo.ErrNoDocuments {
+//			c.JSON(http.StatusBadRequest, "no such workspace")
+//		} else if err != nil {
+//			c.JSON(http.StatusInternalServerError, err.Error())
+//		}
+//
+//		if workspace.Owner == *user.Uid {
+//			err = model.Delete(c, workspaceUID)
+//			if err == model.ResourceNotFound {
+//				c.JSON(http.StatusBadRequest, err)
+//			} else if err != nil {
+//				c.JSON(http.StatusInternalServerError, err.Error())
+//			}
+//			//TODO: send just status
+//			c.JSON(http.StatusAccepted, "")
+//			return
+//		}
+//
+//		c.JSON(http.StatusBadRequest, "no ownership")
+//}
