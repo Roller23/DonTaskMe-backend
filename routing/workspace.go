@@ -3,8 +3,6 @@ package routing
 import (
 	"DonTaskMe-backend/internal/helpers"
 	"DonTaskMe-backend/internal/model"
-	"DonTaskMe-backend/internal/service"
-	"context"
 	"log"
 	"net/http"
 
