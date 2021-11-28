@@ -4,7 +4,6 @@ import (
 	"DonTaskMe-backend/internal/service"
 	"context"
 	"errors"
-
 	nano "github.com/matoous/go-nanoid"
 	"go.mongodb.org/mongo-driver/bson"
 )
@@ -71,4 +70,14 @@ func FindUsersWorkspaces(c context.Context, userUID string) ([]Workspace, error)
 		return nil, err
 	}
 	return workspaces, nil
+}
+
+func FindWorkspace(c context.Context, workspaceUID string) (*Workspace, error) {
+	wh := service.DB.Collection(service.WorkspaceCollectionName)
+	var workspace Workspace
+	err := wh.FindOne(c, bson.D{{"uid", workspaceUID}}).Decode(&workspace)
+	if err != nil {
+		return nil, err
+	}
+	return &workspace, nil
 }
