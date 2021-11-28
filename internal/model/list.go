@@ -16,7 +16,7 @@ type List struct {
 	UID      string `json:"uid"`
 	Title    string `json:"title"`
 	Index    int    `json:"index"`
-	Cards    []Card `json:"card"`
+	Cards    []Card `json:"cards"`
 	BoardUID string `json:"boardUid"`
 }
 
