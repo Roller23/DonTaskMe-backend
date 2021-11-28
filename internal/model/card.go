@@ -3,6 +3,7 @@ package model
 import (
 	"DonTaskMe-backend/internal/service"
 	"context"
+
 	nano "github.com/matoous/go-nanoid"
 	"go.mongodb.org/mongo-driver/bson"
 )
@@ -47,7 +48,7 @@ func FindListCards(c context.Context, listUID string) ([]Card, error) {
 }
 
 func DeleteCard(c context.Context, listUID string, cardUID string) error {
-	wh := service.DB.Collection(service.WorkspaceCollectionName)
+	wh := service.DB.Collection(service.ListCollectionName)
 	res, err := wh.UpdateOne(
 		c, bson.D{{"uid", listUID}},
 		bson.D{{"$pull", bson.D{{"cards", bson.D{{"uid", cardUID}}}}}},
