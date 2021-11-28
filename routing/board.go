@@ -76,38 +76,38 @@ func updateBoard(c *gin.Context) {
 }
 
 func deleteBoard(c *gin.Context) {
-	//			token := c.Query("token")
-	//		user, err := helpers.FindUserByToken(token)
-	//		if err == mongo.ErrNoDocuments {
-	//			c.JSON(http.StatusExpectationFailed, err)
-	//			return
-	//		} else if err != nil {
-	//			c.JSON(http.StatusInternalServerError, err)
-	//			return
-	//		}
-	//
-	//		workspaceUID := c.Param("uid")
-	//		wh := service.DB.Collection(service.WorkspaceCollectionName)
-	//
-	//		var workspace model.Workspace
-	//		err = wh.FindOne(c, bson.D{{"uid", workspaceUID}}).Decode(&workspace)
-	//		if err == mongo.ErrNoDocuments {
-	//			c.JSON(http.StatusBadRequest, "no such workspace")
-	//		} else if err != nil {
-	//			c.JSON(http.StatusInternalServerError, err.Error())
-	//		}
-	//
-	//		if workspace.Owner == *user.Uid {
-	//			err = model.Delete(c, workspaceUID)
-	//			if err == model.ResourceNotFound {
-	//				c.JSON(http.StatusBadRequest, err)
-	//			} else if err != nil {
-	//				c.JSON(http.StatusInternalServerError, err.Error())
-	//			}
-	//			//TODO: send just status
-	//			c.JSON(http.StatusAccepted, "")
-	//			return
-	//		}
-	//
-	//		c.JSON(http.StatusBadRequest, "no ownership")
+	token := c.Query("token")
+	user, err := helpers.FindUserByToken(token)
+	if err == mongo.ErrNoDocuments {
+		c.JSON(http.StatusExpectationFailed, err)
+		return
+	} else if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	workspaceUID := c.Param("workspace")
+	workspace, err := model.FindWorkspace(c, workspaceUID)
+	if err == mongo.ErrNoDocuments {
+		c.JSON(http.StatusBadRequest, "no such workspace")
+		return
+	} else if err != nil {
+		c.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	boardUID := c.Param("board")
+	if workspace.Owner == *user.Uid {
+		err = model.DeleteBoard(c, workspaceUID, boardUID)
+		if err == model.ResourceNotFound {
+			c.JSON(http.StatusBadRequest, err)
+		} else if err != nil {
+			c.JSON(http.StatusInternalServerError, err.Error())
+		}
+		//TODO: send just status
+		c.JSON(http.StatusAccepted, "")
+		return
+	}
+
+	c.JSON(http.StatusBadRequest, "no ownership")
 }

@@ -42,3 +42,18 @@ func FindWorkspaceBoards(c context.Context, workspaceUID string) ([]Board, error
 
 	return workspace.Boards, nil
 }
+
+func DeleteBoard(c context.Context, workspaceUID string, boardUID string) error {
+	wh := service.DB.Collection(service.WorkspaceCollectionName)
+	res, err := wh.UpdateOne(
+		c, bson.D{{"uid", workspaceUID}},
+		bson.D{{"$pull", bson.D{{"boards", bson.D{{"uid", boardUID}}}}}},
+	)
+
+	if err != nil {
+		return err
+	} else if res.ModifiedCount == 0 {
+		return ResourceNotFound
+	}
+	return nil
+}
