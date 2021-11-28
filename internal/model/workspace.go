@@ -29,7 +29,7 @@ var (
 	ResourceNotFound = errors.New("no such resource")
 )
 
-func (w *WorkspaceRequest) Save(ownerUID string) error {
+func (w *WorkspaceRequest) Save(c context.Context, ownerUID string) error {
 	UID, _ := nano.Nanoid()
 	newWorkspace := Workspace{
 		UID:       UID,
@@ -41,17 +41,38 @@ func (w *WorkspaceRequest) Save(ownerUID string) error {
 	}
 
 	wh := service.DB.Collection(service.WorkspaceCollectionName)
-	_, err := wh.InsertOne(context.TODO(), newWorkspace)
+	_, err := wh.InsertOne(c, newWorkspace)
 	return err
 }
 
-func Delete(workspaceUID string) error {
+func Delete(c context.Context, workspaceUID string) error {
 	wh := service.DB.Collection(service.WorkspaceCollectionName)
-	res, err := wh.DeleteOne(context.TODO(), bson.D{{"uid", workspaceUID}})
+	res, err := wh.DeleteOne(c, bson.D{{"uid", workspaceUID}})
 	if err != nil {
 		return err
 	} else if res.DeletedCount == 0 {
 		return ResourceNotFound
 	}
 	return nil
+}
+
+func FindUsersWorkspaces(c context.Context, userUID string, owner bool) ([]Workspace, error) {
+	var accessLevel string
+	if owner {
+		accessLevel = "owner"
+	} else {
+		accessLevel = "labradors"
+	}
+	workspaces := make([]Workspace, 0)
+	wh := service.DB.Collection(service.WorkspaceCollectionName)
+	cursor, err := wh.Find(c, bson.M{accessLevel: bson.M{"$in": []string{userUID}}})
+	if err != nil {
+		return nil, err
+	}
+
+	err = cursor.All(c, &workspaces)
+	if err != nil {
+		return nil, err
+	}
+	return workspaces, nil
 }
