@@ -1,5 +1,5 @@
 package model
 
 type Card struct {
-	Title string `json:"string"`
+	Title string `json:"title"`
 }
