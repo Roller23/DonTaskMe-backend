@@ -3,10 +3,11 @@ package routing
 import (
 	"DonTaskMe-backend/internal/helpers"
 	"DonTaskMe-backend/internal/model"
-	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/mongo"
 	"log"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 func getCards(c *gin.Context) {
@@ -95,19 +96,19 @@ func deleteCard(c *gin.Context) {
 		return
 	}
 
-	listUID := c.Param("list")
-	_, err = model.FindList(c, listUID)
-	if err == mongo.ErrNoDocuments {
-		c.JSON(http.StatusBadRequest, "no such list")
-		return
-	} else if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
-		return
-	}
-
 	//TODO: check if workspace labrador in
 
-	cardUID := c.Param("cardUID")
+	listUID := c.Param("list")
+	// _, err = model.FindList(c, listUID)
+	// if err == mongo.ErrNoDocuments {
+	// 	c.JSON(http.StatusBadRequest, "no such list")
+	// 	return
+	// } else if err != nil {
+	// 	c.JSON(http.StatusInternalServerError, err.Error())
+	// 	return
+	// }
+
+	cardUID := c.Param("card")
 	err = model.DeleteCard(c, listUID, cardUID)
 	if err == model.ResourceNotFound {
 		c.JSON(http.StatusBadRequest, err)
