@@ -112,8 +112,10 @@ func deleteCard(c *gin.Context) {
 	err = model.DeleteCard(c, listUID, cardUID)
 	if err == model.ResourceNotFound {
 		c.JSON(http.StatusBadRequest, err)
+		return
 	} else if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
+		return
 	}
 	//TODO: send just status
 	c.JSON(http.StatusAccepted, "")
