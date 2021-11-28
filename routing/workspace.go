@@ -3,6 +3,8 @@ package routing
 import (
 	"DonTaskMe-backend/internal/helpers"
 	"DonTaskMe-backend/internal/model"
+	"DonTaskMe-backend/internal/service"
+	"go.mongodb.org/mongo-driver/bson"
 	"log"
 	"net/http"
 
@@ -21,7 +23,7 @@ func getWorkspaces(c *gin.Context) {
 		return
 	}
 
-	workspaces, err := model.FindUsersWorkspaces(c, *user.Uid, false)
+	workspaces, err := model.FindUsersWorkspaces(c, *user.Uid)
 	if err != nil {
 		log.Println(err.Error())
 		c.JSON(http.StatusInternalServerError, err.Error())
@@ -71,26 +73,27 @@ func deleteWorkspace(c *gin.Context) {
 		return
 	}
 
-	workspaces, err := model.FindUsersWorkspaces(c, *user.Uid, true)
-	if err != nil {
-		log.Println(err.Error())
+	workspaceUID := c.Param("uid")
+	wh := service.DB.Collection(service.WorkspaceCollectionName)
+
+	var workspace model.Workspace
+	err = wh.FindOne(c, bson.D{{"uid", workspaceUID}}).Decode(&workspace)
+	if err == mongo.ErrNoDocuments {
+		c.JSON(http.StatusBadRequest, "no such workspace")
+	} else if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
-		return
 	}
 
-	UID := c.Param("uid")
-	for _, w := range workspaces {
-		if w.UID == UID {
-			err = model.Delete(c, UID)
-			if err == model.ResourceNotFound {
-				c.JSON(http.StatusBadRequest, err)
-			} else if err != nil {
-				c.JSON(http.StatusInternalServerError, err.Error())
-			}
-			//TODO: send just status
-			c.JSON(http.StatusAccepted, "")
-			return
+	if workspace.Owner == *user.Uid {
+		err = model.Delete(c, workspaceUID)
+		if err == model.ResourceNotFound {
+			c.JSON(http.StatusBadRequest, err)
+		} else if err != nil {
+			c.JSON(http.StatusInternalServerError, err.Error())
 		}
+		//TODO: send just status
+		c.JSON(http.StatusAccepted, "")
+		return
 	}
 
 	c.JSON(http.StatusBadRequest, "no ownership")

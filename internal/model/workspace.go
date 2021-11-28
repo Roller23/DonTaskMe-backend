@@ -58,16 +58,10 @@ func Delete(c context.Context, workspaceUID string) error {
 	return nil
 }
 
-func FindUsersWorkspaces(c context.Context, userUID string, owner bool) ([]Workspace, error) {
-	var accessLevel string
-	if owner {
-		accessLevel = "owner"
-	} else {
-		accessLevel = "labradors"
-	}
+func FindUsersWorkspaces(c context.Context, userUID string) ([]Workspace, error) {
 	workspaces := make([]Workspace, 0)
 	wh := service.DB.Collection(service.WorkspaceCollectionName)
-	cursor, err := wh.Find(c, bson.M{accessLevel: bson.M{"$in": []string{userUID}}})
+	cursor, err := wh.Find(c, bson.M{"labradors": bson.M{"$in": []string{userUID}}})
 	if err != nil {
 		return nil, err
 	}
