@@ -3,8 +3,6 @@ package routing
 import (
 	"DonTaskMe-backend/internal/helpers"
 	"DonTaskMe-backend/internal/model"
-	"DonTaskMe-backend/internal/service"
-	"go.mongodb.org/mongo-driver/bson"
 	"log"
 	"net/http"
 
@@ -74,14 +72,13 @@ func deleteWorkspace(c *gin.Context) {
 	}
 
 	workspaceUID := c.Param("uid")
-	wh := service.DB.Collection(service.WorkspaceCollectionName)
-
-	var workspace model.Workspace
-	err = wh.FindOne(c, bson.D{{"uid", workspaceUID}}).Decode(&workspace)
+	workspace, err := model.FindWorkspace(c, workspaceUID)
 	if err == mongo.ErrNoDocuments {
 		c.JSON(http.StatusBadRequest, "no such workspace")
+		return
 	} else if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
+		return
 	}
 
 	if workspace.Owner == *user.Uid {

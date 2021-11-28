@@ -20,15 +20,15 @@ type User struct {
 	Token    *string `json:"token,omitempty"`
 }
 
-func (u *User) AssignNewToken() error {
+func (u *User) AssignNewToken(c context.Context) error {
 	uid, _ := nano.Nanoid()
 	u.Token = &uid
 	usersCollection := service.DB.Collection(service.UsersCollectionName)
-	_, err := usersCollection.UpdateOne(context.TODO(), bson.M{"uid": u.Uid}, bson.D{{"$set", bson.D{{"token", u.Token}}}})
+	_, err := usersCollection.UpdateOne(c, bson.M{"uid": u.Uid}, bson.D{{"$set", bson.D{{"token", u.Token}}}})
 	return err
 }
 
-func (u *UserRequest) Save() error {
+func (u *UserRequest) Save(c context.Context) error {
 	hashedPassword, err := hash.Generate(&u.Password)
 	if err != nil {
 		return err
@@ -43,6 +43,6 @@ func (u *UserRequest) Save() error {
 	}
 
 	usersCollection := service.DB.Collection(service.UsersCollectionName)
-	_, err = usersCollection.InsertOne(context.TODO(), newUser)
+	_, err = usersCollection.InsertOne(c, newUser)
 	return err
 }

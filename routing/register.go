@@ -27,7 +27,7 @@ func register(c *gin.Context) {
 	//	)
 	//}
 
-	err := userReq.Save()
+	err := userReq.Save(c)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
 	}

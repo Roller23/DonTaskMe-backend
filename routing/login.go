@@ -30,7 +30,7 @@ func login(c *gin.Context) {
 		return
 	}
 
-	err = dbUser.AssignNewToken()
+	err = dbUser.AssignNewToken(c)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, "could not create token")
 		return
