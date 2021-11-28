@@ -4,33 +4,26 @@ import (
 	"DonTaskMe-backend/internal/helpers"
 	"DonTaskMe-backend/internal/model"
 	"DonTaskMe-backend/internal/service"
-	"context"
+	"go.mongodb.org/mongo-driver/bson"
 	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 func getWorkspaces(c *gin.Context) {
 	token := c.Query("token")
 	user, err := helpers.FindUserByToken(token)
-	if err != nil {
-		c.JSON(http.StatusNotAcceptable, "access denied")
+	if err == mongo.ErrNoDocuments {
+		c.JSON(http.StatusExpectationFailed, err)
+		return
+	} else if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
 
-	workspaces := make([]model.Workspace, 0)
-	wh := service.DB.Collection(service.WorkspaceCollectionName)
-	cursor, err := wh.Find(context.TODO(), bson.M{"labradors": bson.M{"$in": []string{*user.Uid}}})
-	if err != nil {
-		log.Println(err.Error())
-		c.JSON(http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	err = cursor.All(context.TODO(), &workspaces)
+	workspaces, err := model.FindUsersWorkspaces(c, *user.Uid)
 	if err != nil {
 		log.Println(err.Error())
 		c.JSON(http.StatusInternalServerError, err.Error())
@@ -57,7 +50,7 @@ func addWorkspace(c *gin.Context) {
 		return
 	}
 
-	workspace, err := workspaceReq.Save(*user.Uid)
+	workspace, err := workspaceReq.Save(c, *user.Uid)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
@@ -65,18 +58,43 @@ func addWorkspace(c *gin.Context) {
 	c.JSON(http.StatusCreated, workspace)
 }
 
-func updateWorkspace(c *gin.Context) {
+func updateWorkspace(_ *gin.Context) {
 	panic("Not implemented yet!")
 }
 
 func deleteWorkspace(c *gin.Context) {
-	UID := c.Param("uid")
-	err := model.Delete(UID)
-	if err == model.ResourceNotFound {
-		c.JSON(http.StatusBadRequest, err)
+	token := c.Query("token")
+	user, err := helpers.FindUserByToken(token)
+	if err == mongo.ErrNoDocuments {
+		c.JSON(http.StatusExpectationFailed, err)
+		return
+	} else if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	workspaceUID := c.Param("uid")
+	wh := service.DB.Collection(service.WorkspaceCollectionName)
+
+	var workspace model.Workspace
+	err = wh.FindOne(c, bson.D{{"uid", workspaceUID}}).Decode(&workspace)
+	if err == mongo.ErrNoDocuments {
+		c.JSON(http.StatusBadRequest, "no such workspace")
 	} else if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
 	}
-	//TODO: send just status
-	c.JSON(http.StatusAccepted, "")
+
+	if workspace.Owner == *user.Uid {
+		err = model.Delete(c, workspaceUID)
+		if err == model.ResourceNotFound {
+			c.JSON(http.StatusBadRequest, err)
+		} else if err != nil {
+			c.JSON(http.StatusInternalServerError, err.Error())
+		}
+		//TODO: send just status
+		c.JSON(http.StatusAccepted, "")
+		return
+	}
+
+	c.JSON(http.StatusBadRequest, "no ownership")
 }
