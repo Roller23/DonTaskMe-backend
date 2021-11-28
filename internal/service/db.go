@@ -13,6 +13,7 @@ const (
 	Name                    = "myFirstDatabase"
 	UsersCollectionName     = "users"
 	WorkspaceCollectionName = "workspaces"
+	ListCollectionName      = "lists"
 )
 
 var (
