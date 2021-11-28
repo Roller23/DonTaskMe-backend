@@ -3,10 +3,13 @@ package routing
 import (
 	"DonTaskMe-backend/internal/helpers"
 	"DonTaskMe-backend/internal/model"
-	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/mongo"
+	"DonTaskMe-backend/internal/service"
+	"context"
 	"log"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 func getWorkspaces(c *gin.Context) {
@@ -47,13 +50,12 @@ func addWorkspace(c *gin.Context) {
 		return
 	}
 
-	err = workspaceReq.Save(c, *user.Uid)
+	workspace, err := workspaceReq.Save(c, *user.Uid)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
-
-	c.Status(http.StatusCreated)
+	c.JSON(http.StatusCreated, workspace)
 }
 
 func updateWorkspace(_ *gin.Context) {
