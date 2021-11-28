@@ -26,5 +26,9 @@ func GetServer(mode string) *gin.Engine {
 	router.PATCH("/boards/:uid", updateBoard)
 	router.DELETE("/boards/:workspace/:board", deleteBoard)
 
+	router.GET("/lists/:board", getLists)
+	router.POST("/lists/:board", addList)
+	router.DELETE("/lists/:uid", deleteList)
+
 	return router
 }
