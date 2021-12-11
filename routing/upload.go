@@ -35,8 +35,6 @@ func UploadFile(path string) (FileResponse, error) {
 	}
 	defer file.Close()
 
-	log.Println("uploading", file.Name())
-
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 	part, _ := writer.CreateFormFile("file", filepath.Base(file.Name()))
@@ -53,6 +51,8 @@ func UploadFile(path string) (FileResponse, error) {
 	client := &http.Client{}
 	req.Header.Add("User-Agent", "Mozilla/5.0")
 	req.Header.Add("Content-Type", writer.FormDataContentType())
+
+	log.Println("uploading", file.Name())
 
 	resp, err := client.Do(req)
 	if err != nil {
