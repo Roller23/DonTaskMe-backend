@@ -104,8 +104,8 @@ func deleteBoard(c *gin.Context) {
 		} else if err != nil {
 			c.JSON(http.StatusInternalServerError, err.Error())
 		}
-		//TODO: send just status
-		c.JSON(http.StatusAccepted, "")
+
+		c.Writer.WriteHeader(http.StatusAccepted)
 		return
 	}
 

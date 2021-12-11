@@ -19,14 +19,6 @@ func register(c *gin.Context) {
 		return
 	}
 
-	//TODO: validate password
-	//if !isPasswordValid(ld.Password) {
-	//	c.JSON(
-	//		http.StatusNotAcceptable,
-	//		errorMsg{ Message: "Password does not meet minimal rules: eight characters, one digit, one capital letter, one special character, one lowercase letter" },
-	//	)
-	//}
-
 	err := userReq.Save(c)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
