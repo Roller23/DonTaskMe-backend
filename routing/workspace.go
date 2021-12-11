@@ -77,7 +77,7 @@ func deleteWorkspace(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, "no such workspace")
 		return
 	} else if err != nil {
-		c.JSON(http.StatusInternalServerError, err.Error())
+		c.Writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
@@ -88,8 +88,8 @@ func deleteWorkspace(c *gin.Context) {
 		} else if err != nil {
 			c.JSON(http.StatusInternalServerError, err.Error())
 		}
-		//TODO: send just status
-		c.JSON(http.StatusAccepted, "")
+
+		c.Writer.WriteHeader(http.StatusAccepted)
 		return
 	}
 

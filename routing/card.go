@@ -117,6 +117,6 @@ func deleteCard(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
-	//TODO: send just status
-	c.JSON(http.StatusAccepted, "")
+
+	c.Writer.WriteHeader(http.StatusAccepted)
 }
