@@ -91,6 +91,10 @@ func saveFile(c *gin.Context) {
 	storagePath := "uploads/"
 	newPath := storagePath + newFilename
 
+	if _, err := os.Stat(storagePath); os.IsNotExist(err) {
+		os.Mkdir(storagePath, 0777)
+	}
+
 	if err = c.SaveUploadedFile(file, newPath); err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, "Unable to save the file")
 		return
