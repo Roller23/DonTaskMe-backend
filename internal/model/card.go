@@ -9,23 +9,26 @@ import (
 )
 
 type CardReq struct {
-	Title   string `json:"title"`
-	Index   int    `json:"index"`
-	ListUID string `json:"listUid"`
+	Title       string `json:"title"`
+	Index       int    `json:"index"`
+	ListUID     string `json:"listUid"`
+	Description string `json:"description"`
 }
 
 type Card struct {
-	Title string `json:"title"`
-	Index int    `json:"index"`
-	UID   string `json:"uid"`
+	Title       string `json:"title"`
+	Index       int    `json:"index"`
+	UID         string `json:"uid"`
+	Description string `json:"description"`
 }
 
 func (c *CardReq) Save(ctx context.Context, listUID string) (*Card, error) {
 	UID, _ := nano.Nanoid()
 	newCard := Card{
-		UID:   UID,
-		Index: c.Index,
-		Title: c.Title,
+		UID:         UID,
+		Index:       c.Index,
+		Title:       c.Title,
+		Description: c.Description,
 	}
 
 	lh := service.DB.Collection(service.ListCollectionName)

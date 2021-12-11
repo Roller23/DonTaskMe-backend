@@ -31,12 +31,3 @@ func UserAlreadyExists(username *string) bool {
 	err := usersCollection.FindOne(context.TODO(), bson.M{"username": username}).Decode(&res)
 	return err != mongo.ErrNoDocuments
 }
-
-//TODO: Fix the regexp
-//func IsPasswordValid(password string) bool {
-//	exp, err := regexp.Compile(`.{8,}(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W)`)
-//	if err != nil {
-//		log.Fatalln("Regexp did not compile: ", err.Error())
-//	}
-//	return exp.Match([]byte(password))
-//}
