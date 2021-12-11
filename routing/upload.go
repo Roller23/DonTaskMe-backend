@@ -52,12 +52,14 @@ func UploadFile(path string) (FileResponse, error) {
 	req.Header.Add("User-Agent", "Mozilla/5.0")
 	req.Header.Add("Content-Type", writer.FormDataContentType())
 
-	log.Println("uploading", file.Name())
+	log.Println("uploading", filepath.Base(file.Name()))
 
 	resp, err := client.Do(req)
 	if err != nil {
 		return FileResponse{}, err
 	}
+
+	log.Println("upload completed")
 
 	content, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
