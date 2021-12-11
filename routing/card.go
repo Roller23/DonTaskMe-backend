@@ -46,7 +46,7 @@ func addCard(c *gin.Context) {
 	var cardReq model.CardReq
 	err = c.ShouldBindJSON(&cardReq)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, err.Error())
+		c.Writer.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -80,9 +80,28 @@ func updateCard(c *gin.Context) {
 		return
 	}
 
-	//TODO: update
-	deleteCard(c)
-	addCard(c)
+	var updateReq model.CardUpdateReq
+	err = c.ShouldBindJSON(&updateReq)
+	if err != nil {
+		log.Println("Inappropriate body")
+		c.Writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	cardUID := c.Param("card")
+	err = model.UpdateCard(c, cardUID, updateReq)
+
+	if err == model.ResourceNotFound {
+		log.Println("No such resource")
+		c.JSON(http.StatusBadRequest, err)
+		return
+	} else if err != nil {
+		log.Println(err.Error())
+		c.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.Writer.WriteHeader(http.StatusAccepted)
 }
 
 func deleteCard(c *gin.Context) {
