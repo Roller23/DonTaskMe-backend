@@ -21,7 +21,7 @@ func getCards(c *gin.Context) {
 		return
 	}
 
-	listUID := c.Param("list")
+	listUID := c.Query("list")
 	boards, err := model.FindListCards(c, listUID)
 	if err != nil {
 		log.Println(err.Error())
@@ -61,12 +61,12 @@ func addCard(c *gin.Context) {
 
 	//TODO: check if list labradors contains user uid
 
-	board, err := cardReq.Save(c, list.UID)
+	card, err := cardReq.Save(c, list.UID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
-	c.JSON(http.StatusCreated, board)
+	c.JSON(http.StatusCreated, card)
 }
 
 func updateCard(c *gin.Context) {

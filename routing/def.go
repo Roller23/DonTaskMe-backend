@@ -30,10 +30,12 @@ func GetServer(mode string) *gin.Engine {
 	router.POST("/lists/:board", addList)
 	router.DELETE("/lists/:uid", deleteList)
 
-	router.GET("/cards/:list", getCards)
+	router.GET("/cards", getCards)
 	router.POST("/cards", addCard)
 	router.PUT("/cards/:card", updateCard)
 	router.DELETE("/cards/:list/:card", deleteCard)
+
+	router.POST("cards/:card/comment", addComment)
 
 	return router
 }
