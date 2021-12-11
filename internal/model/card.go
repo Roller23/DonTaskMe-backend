@@ -3,7 +3,6 @@ package model
 import (
 	"DonTaskMe-backend/internal/service"
 	"context"
-
 	nano "github.com/matoous/go-nanoid"
 	"go.mongodb.org/mongo-driver/bson"
 )
@@ -73,12 +72,11 @@ func DeleteCard(c context.Context, listUID string, cardUID string) error {
 
 func UpdateCard(c context.Context, cardUID string, updateBody CardUpdateReq) error {
 	wh := service.DB.Collection(service.ListCollectionName)
-	//{awards: {$elemMatch: {award:'National Medal', year:1975}}}
 	filter := bson.M{"cards": bson.M{"$elemMatch": bson.M{"uid": cardUID}}}
 	var toSet bson.D
-	combineIfExists(&toSet, "index", updateBody.Index)
-	combineIfExists(&toSet, "title", updateBody.Title)
-	combineIfExists(&toSet, "description", updateBody.Description)
+	combineIfExists(&toSet, "cards.$.index", updateBody.Index)
+	combineIfExists(&toSet, "cards.$.title", updateBody.Title)
+	combineIfExists(&toSet, "cards.$.description", updateBody.Description)
 	update := bson.D{{"$set", toSet}}
 	res, err := wh.UpdateOne(c, filter, update)
 	if err != nil {
@@ -90,6 +88,9 @@ func UpdateCard(c context.Context, cardUID string, updateBody CardUpdateReq) err
 }
 
 func combineIfExists(doc *bson.D, key string, val interface{}) {
+	if doc == nil {
+		doc = &bson.D{}
+	}
 	if val != nil {
 		*doc = append(*doc, bson.E{Key: key, Value: val})
 	}
