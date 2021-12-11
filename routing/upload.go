@@ -35,6 +35,8 @@ func UploadFile(path string) (FileResponse, error) {
 	}
 	defer file.Close()
 
+	log.Println("uploading", file.Name())
+
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 	part, _ := writer.CreateFormFile("file", filepath.Base(file.Name()))
