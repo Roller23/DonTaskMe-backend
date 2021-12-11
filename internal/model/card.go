@@ -21,11 +21,12 @@ type CardUpdateReq struct {
 }
 
 type Card struct {
-	Title       string    `json:"title"`
-	Index       int       `json:"index"`
-	UID         string    `json:"uid"`
-	Description string    `json:"description"`
-	Comments    []Comment `json:"comments"`
+	Title       string     `json:"title"`
+	Index       int        `json:"index"`
+	UID         string     `json:"uid"`
+	Description string     `json:"description"`
+	Comments    []Comment  `json:"comments"`
+	FilesMeta   []FileInfo `json:"filesMeta"`
 }
 
 func (c *CardReq) Save(ctx context.Context, listUID string) (*Card, error) {
@@ -36,6 +37,7 @@ func (c *CardReq) Save(ctx context.Context, listUID string) (*Card, error) {
 		Title:       c.Title,
 		Description: c.Description,
 		Comments:    []Comment{},
+		FilesMeta:   []FileInfo{},
 	}
 
 	lh := service.DB.Collection(service.ListCollectionName)
