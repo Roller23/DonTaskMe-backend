@@ -37,5 +37,7 @@ func GetServer(mode string) *gin.Engine {
 
 	router.POST("cards/:card/comment", addComment)
 
+	router.POST("cards/:card/upload", saveFile)
+
 	return router
 }
