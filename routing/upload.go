@@ -131,7 +131,7 @@ func saveFile(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusAccepted, "Your file has been successfully uploaded.")
+	c.JSON(http.StatusAccepted, fileInfo)
 }
 
 func deleteFile(c *gin.Context) {
