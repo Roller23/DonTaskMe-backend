@@ -13,17 +13,19 @@ type CommentReq struct {
 }
 
 type Comment struct {
-	UID     string `json:"uid"`
-	Content string `json:"content"`
-	Date    int64  `json:"date"`
+	UID      string `json:"uid"`
+	Content  string `json:"content"`
+	Date     int64  `json:"date"`
+	Username string `json:"username"`
 }
 
-func (req *CommentReq) Save(c context.Context, cardUID string) (*Comment, error) {
+func (req *CommentReq) Save(c context.Context, cardUID, username string) (*Comment, error) {
 	UID, _ := nano.Nanoid()
 	newComment := Comment{
-		UID:     UID,
-		Content: req.Content,
-		Date:    time.Now().Unix(),
+		UID:      UID,
+		Content:  req.Content,
+		Date:     time.Now().Unix(),
+		Username: username,
 	}
 
 	lh := service.DB.Collection(service.ListCollectionName)

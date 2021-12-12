@@ -10,7 +10,7 @@ import (
 
 func addComment(c *gin.Context) {
 	token := c.Query("token")
-	_, err := helpers.FindUserByToken(token)
+	user, err := helpers.FindUserByToken(token)
 	if err == mongo.ErrNoDocuments {
 		c.JSON(http.StatusExpectationFailed, err)
 		return
@@ -26,7 +26,7 @@ func addComment(c *gin.Context) {
 		return
 	}
 
-	comment, err := commentReq.Save(c, c.Param("card"))
+	comment, err := commentReq.Save(c, c.Param("card"), user.Username)
 	if err == model.ResourceNotFound {
 		c.JSON(http.StatusBadRequest, "Resource not found")
 		return
