@@ -49,7 +49,7 @@ func UploadFile(path string) (FileResponse, error) {
 	}
 
 	client := &http.Client{}
-	req.Header.Add("User-Agent", "Mozilla/5.0")
+	req.Header.Add("Server", "Apache") // X D
 	req.Header.Add("Content-Type", writer.FormDataContentType())
 
 	log.Println("uploading", filepath.Base(file.Name()))
