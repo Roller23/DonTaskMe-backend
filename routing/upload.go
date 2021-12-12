@@ -5,6 +5,7 @@ import (
 	"DonTaskMe-backend/internal/model"
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -131,6 +132,7 @@ func saveFile(c *gin.Context) {
 		return
 	}
 
+	fileInfo.StoragePath = fmt.Sprintf("%s/%s", storageUrl, fileInfo.StoragePath)
 	c.JSON(http.StatusAccepted, fileInfo)
 }
 
