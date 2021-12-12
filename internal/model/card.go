@@ -26,7 +26,7 @@ type Card struct {
 	UID         string     `json:"uid"`
 	Description string     `json:"description"`
 	Comments    []Comment  `json:"comments"`
-	FilesMeta   []FileInfo `json:"filesMeta"`
+	Files       []FileInfo `json:"files"`
 }
 
 func (c *CardReq) Save(ctx context.Context, listUID string) (*Card, error) {
@@ -37,7 +37,7 @@ func (c *CardReq) Save(ctx context.Context, listUID string) (*Card, error) {
 		Title:       c.Title,
 		Description: c.Description,
 		Comments:    []Comment{},
-		FilesMeta:   []FileInfo{},
+		Files:       []FileInfo{},
 	}
 
 	lh := service.DB.Collection(service.ListCollectionName)
@@ -59,10 +59,10 @@ func FindListCards(c context.Context, listUID string) ([]Card, error) {
 	return list.Cards, nil
 }
 
-func DeleteCard(c context.Context, listUID string, cardUID string) error {
+func DeleteCard(c context.Context, cardUID string) error {
 	wh := service.DB.Collection(service.ListCollectionName)
-	res, err := wh.UpdateOne(
-		c, bson.D{{"uid", listUID}},
+	filter := bson.M{"cards": bson.M{"$elemMatch": bson.M{"uid": cardUID}}}
+	res, err := wh.UpdateOne(c, filter,
 		bson.D{{"$pull", bson.D{{"cards", bson.D{{"uid", cardUID}}}}}},
 	)
 

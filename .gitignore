@@ -17,3 +17,6 @@ serv.iml
 
 # Dependency directories
 vendor/
+
+# Files
+uploads/

@@ -115,20 +115,8 @@ func deleteCard(c *gin.Context) {
 		return
 	}
 
-	//TODO: check if workspace labrador in
-
-	listUID := c.Param("list")
-	// _, err = model.FindList(c, listUID)
-	// if err == mongo.ErrNoDocuments {
-	// 	c.JSON(http.StatusBadRequest, "no such list")
-	// 	return
-	// } else if err != nil {
-	// 	c.JSON(http.StatusInternalServerError, err.Error())
-	// 	return
-	// }
-
 	cardUID := c.Param("card")
-	err = model.DeleteCard(c, listUID, cardUID)
+	err = model.DeleteCard(c, cardUID)
 	if err == model.ResourceNotFound {
 		c.JSON(http.StatusBadRequest, err)
 		return
