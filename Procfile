@@ -1,0 +1,1 @@
+web: go run -tags netgo main.go
