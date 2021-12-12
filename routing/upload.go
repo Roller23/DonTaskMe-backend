@@ -118,9 +118,11 @@ func saveFile(c *gin.Context) {
 	}
 
 	cardUID := c.Param("card")
+	fileUID, _ := nano.Nanoid()
 	fileInfo := model.FileInfo{
 		Filename:    file.Filename,
 		StoragePath: res.Path,
+		UID:         fileUID,
 	}
 
 	err = fileInfo.Save(c, cardUID)
@@ -130,4 +132,28 @@ func saveFile(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusAccepted, "Your file has been successfully uploaded.")
+}
+
+func deleteFile(c *gin.Context) {
+	token := c.Query("token")
+	_, err := helpers.FindUserByToken(token)
+	if err == mongo.ErrNoDocuments {
+		c.AbortWithStatusJSON(http.StatusExpectationFailed, err)
+		return
+	} else if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	cardUID := c.Param("card")
+	fileUID := c.Param("file")
+
+	err = model.DeleteFile(c, cardUID, fileUID)
+	if err == model.ResourceNotFound {
+		c.AbortWithStatusJSON(http.StatusBadRequest, "No such file on the server")
+	} else if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, err.Error())
+	}
+
+	c.Writer.WriteHeader(http.StatusAccepted)
 }
