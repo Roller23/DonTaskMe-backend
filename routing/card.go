@@ -3,6 +3,7 @@ package routing
 import (
 	"DonTaskMe-backend/internal/helpers"
 	"DonTaskMe-backend/internal/model"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -22,14 +23,20 @@ func getCards(c *gin.Context) {
 	}
 
 	listUID := c.Query("list")
-	boards, err := model.FindListCards(c, listUID)
+	cards, err := model.FindListCards(c, listUID)
 	if err != nil {
 		log.Println(err.Error())
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, boards)
+	for _, card := range cards {
+		for _, file := range card.Files {
+			file.StoragePath = fmt.Sprintf("%s/%s", storageUrl, file.StoragePath)
+		}
+	}
+
+	c.JSON(http.StatusOK, cards)
 }
 
 func addCard(c *gin.Context) {
