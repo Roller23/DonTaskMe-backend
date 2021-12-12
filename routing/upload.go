@@ -20,7 +20,7 @@ import (
 )
 
 const (
-	storageUrl = "http://dontstoreme.vxm.pl/index.php"
+	storageUrl = "http://dontstoreme.vxm.pl"
 )
 
 type FileResponse struct {
