@@ -3,10 +3,12 @@ package routing
 import (
 	"DonTaskMe-backend/internal/helpers"
 	"DonTaskMe-backend/internal/model"
-	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/mongo"
+	"fmt"
 	"log"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 func getLists(c *gin.Context) {
@@ -26,6 +28,14 @@ func getLists(c *gin.Context) {
 		log.Println(err.Error())
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
+	}
+
+	for _, list := range lists {
+		for _, card := range list.Cards {
+			for _, file := range card.Files {
+				file.StoragePath = fmt.Sprintf("%s/%s", storageUrl, file.StoragePath)
+			}
+		}
 	}
 
 	c.JSON(http.StatusOK, lists)
