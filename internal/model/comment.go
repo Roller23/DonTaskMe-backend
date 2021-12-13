@@ -3,29 +3,33 @@ package model
 import (
 	"DonTaskMe-backend/internal/service"
 	"context"
+	"time"
+
 	nano "github.com/matoous/go-nanoid"
 	"go.mongodb.org/mongo-driver/bson"
-	"time"
 )
 
 type CommentReq struct {
-	Content string `json:"content"`
+	Content      string  `json:"content"`
+	FileAttached *string `json:"fileAttached,omitempty"`
 }
 
 type Comment struct {
-	UID      string `json:"uid"`
-	Content  string `json:"content"`
-	Date     int64  `json:"date"`
-	Username string `json:"username"`
+	UID          string  `json:"uid"`
+	Content      string  `json:"content"`
+	Date         int64   `json:"date"`
+	Username     string  `json:"username"`
+	FileAttached *string `json:"fileAttached,omitempty"`
 }
 
 func (req *CommentReq) Save(c context.Context, cardUID, username string) (*Comment, error) {
 	UID, _ := nano.Nanoid()
 	newComment := Comment{
-		UID:      UID,
-		Content:  req.Content,
-		Date:     time.Now().Unix(),
-		Username: username,
+		UID:          UID,
+		Content:      req.Content,
+		Date:         time.Now().Unix(),
+		Username:     username,
+		FileAttached: req.FileAttached,
 	}
 
 	lh := service.DB.Collection(service.ListCollectionName)
