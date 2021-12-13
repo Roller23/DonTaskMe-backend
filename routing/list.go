@@ -30,10 +30,11 @@ func getLists(c *gin.Context) {
 		return
 	}
 
-	for _, list := range lists {
-		for _, card := range list.Cards {
-			for _, file := range card.Files {
-				file.StoragePath = fmt.Sprintf("%s/%s", storageUrl, file.StoragePath)
+	for i := range lists {
+		for j := range lists[i].Cards {
+			for k := range lists[i].Cards[j].Files {
+				fullPath := fmt.Sprintf("%s/%s", storageUrl, lists[i].Cards[j].Files[k].StoragePath)
+				lists[i].Cards[j].Files[k].StoragePath = fullPath
 			}
 		}
 	}

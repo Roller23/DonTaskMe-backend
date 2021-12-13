@@ -2,11 +2,12 @@ package service
 
 import (
 	"context"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"os"
 	"time"
+
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 const (
@@ -32,7 +33,7 @@ func InitDb() {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
-	log.Printf("Connecting to: %s", os.Getenv("DB_NAME"))
+	log.Printf("Connecting to: %s", Name)
 	err = client.Connect(ctx)
 	if err != nil {
 		log.Fatal(err)
