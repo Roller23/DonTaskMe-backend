@@ -3,6 +3,8 @@ package model
 import (
 	"DonTaskMe-backend/internal/service"
 	"context"
+	"time"
+
 	nano "github.com/matoous/go-nanoid"
 	"go.mongodb.org/mongo-driver/bson"
 )
@@ -27,6 +29,7 @@ type Card struct {
 	Description string     `json:"description"`
 	Comments    []Comment  `json:"comments"`
 	Files       []FileInfo `json:"files"`
+	Timestamp   int64      `json:"timestamp"`
 }
 
 func (c *CardReq) Save(ctx context.Context, listUID string) (*Card, error) {
@@ -38,6 +41,7 @@ func (c *CardReq) Save(ctx context.Context, listUID string) (*Card, error) {
 		Description: c.Description,
 		Comments:    []Comment{},
 		Files:       []FileInfo{},
+		Timestamp:   time.Now().Unix(),
 	}
 
 	lh := service.DB.Collection(service.ListCollectionName)
