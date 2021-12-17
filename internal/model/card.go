@@ -20,6 +20,7 @@ type CardUpdateReq struct {
 	Title       *string `json:"title,omitempty"`
 	Index       *int    `json:"index,omitempty"`
 	Description *string `json:"description,omitempty"`
+	Color       *string `json:"color,omitempty"`
 }
 
 type Card struct {
@@ -30,6 +31,7 @@ type Card struct {
 	Comments    []Comment  `json:"comments"`
 	Files       []FileInfo `json:"files"`
 	Timestamp   int64      `json:"timestamp"`
+	Color       string     `json:"color"`
 }
 
 func (c *CardReq) Save(ctx context.Context, listUID string) (*Card, error) {
@@ -85,6 +87,7 @@ func UpdateCard(c context.Context, cardUID string, updateBody CardUpdateReq) err
 	combineIfExists(&toSet, "cards.$.index", updateBody.Index)
 	combineIfExists(&toSet, "cards.$.title", updateBody.Title)
 	combineIfExists(&toSet, "cards.$.description", updateBody.Description)
+	combineIfExists(&toSet, "cards.$.color", updateBody.Color)
 	update := bson.D{{"$set", toSet}}
 	res, err := wh.UpdateOne(c, filter, update)
 	if err != nil {
