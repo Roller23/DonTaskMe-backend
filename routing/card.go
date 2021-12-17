@@ -21,7 +21,7 @@ func isHexColor(str string) bool {
 	}
 	numbers := str[1:]
 	for _, char := range numbers {
-		if !unicode.IsDigit(char) {
+		if !(unicode.IsDigit(char) || unicode.IsLetter(char)) {
 			return false
 		}
 	}
@@ -113,7 +113,7 @@ func updateCard(c *gin.Context) {
 	}
 
 	if updateReq.Color != nil && !isHexColor(*updateReq.Color) {
-		log.Println(updateReq.Color, "is not a hex color")
+		log.Println(*updateReq.Color, "is not a hex color")
 		c.Writer.WriteHeader(http.StatusBadRequest)
 		return
 	}
