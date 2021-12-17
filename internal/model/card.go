@@ -3,6 +3,7 @@ package model
 import (
 	"DonTaskMe-backend/internal/service"
 	"context"
+	"reflect"
 	"time"
 
 	nano "github.com/matoous/go-nanoid"
@@ -102,7 +103,7 @@ func combineIfExists(doc *bson.D, key string, val interface{}) {
 	if doc == nil {
 		doc = &bson.D{}
 	}
-	if val != nil {
+	if val != nil && !reflect.ValueOf(val).IsNil() {
 		*doc = append(*doc, bson.E{Key: key, Value: val})
 	}
 }
