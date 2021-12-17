@@ -6,10 +6,27 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"unicode"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/mongo"
 )
+
+func isHexColor(str string) bool {
+	if len(str) > 7 || len(str) < 4 {
+		return false
+	}
+	if str[0] != '#' {
+		return false
+	}
+	numbers := str[1:]
+	for _, char := range numbers {
+		if !unicode.IsDigit(char) {
+			return false
+		}
+	}
+	return true
+}
 
 func getCards(c *gin.Context) {
 	token := c.Query("token")
@@ -91,6 +108,12 @@ func updateCard(c *gin.Context) {
 	err = c.ShouldBindJSON(&updateReq)
 	if err != nil {
 		log.Println("Inappropriate body")
+		c.Writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if updateReq.Color != nil && !isHexColor(*updateReq.Color) {
+		log.Println(updateReq.Color, "is not a hex color")
 		c.Writer.WriteHeader(http.StatusBadRequest)
 		return
 	}
