@@ -104,16 +104,6 @@ func UpdateCard(c context.Context, cardUID string, updateBody CardUpdateReq) err
 }
 
 func MoveCard(c context.Context, cardUID string, updateBody *CardMoveReq) error {
-	wh := service.DB.Collection(service.ListCollectionName)
-
-	toPull := bson.M{"cards": bson.M{"$elemMatch": bson.M{"uid": cardUID}}}
-	res, err := wh.UpdateOne(c, bson.D{}, toPull)
-	if err != nil {
-		return err
-	} else if res.ModifiedCount == 0 {
-		return ResourceNotFound
-	}
-
 	card, err := getCard(c, cardUID)
 	if err != nil {
 		return ResourceNotFound
