@@ -3,6 +3,7 @@ package model
 import (
 	"DonTaskMe-backend/internal/service"
 	"context"
+	"log"
 	"reflect"
 	"time"
 
@@ -104,21 +105,30 @@ func UpdateCard(c context.Context, cardUID string, updateBody CardUpdateReq) err
 }
 
 func MoveCard(c context.Context, cardUID string, updateBody *CardMoveReq) error {
+	log.Printf("List UID: %s\n", updateBody.ListUID)
 	card, err := getCard(c, cardUID)
 	if err != nil {
+		log.Println("Get error")
+		log.Println(err)
 		return ResourceNotFound
 	}
+	log.Printf("Card %+v", card)
 
 	err = DeleteCard(c, cardUID)
 	if err != nil {
+		log.Println("Delete error")
 		return err
 	}
 
 	lh := service.DB.Collection(service.ListCollectionName)
 	_, err = lh.UpdateOne(c, bson.M{"uid": updateBody.ListUID}, bson.D{{"$push", bson.D{{"cards", card}}}})
 	if err != nil {
+		log.Println("Update error")
+		log.Println(err)
 		return err
 	}
+
+	log.Println("No error")
 	return nil
 }
 
