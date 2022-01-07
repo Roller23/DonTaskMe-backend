@@ -134,13 +134,19 @@ func MoveCard(c context.Context, cardUID string, updateBody *CardMoveReq) error 
 
 func getCard(c context.Context, cardUID string) (*Card, error) {
 	wh := service.DB.Collection(service.ListCollectionName)
-	var card Card
+	var list List
 	filter := bson.M{"cards": bson.M{"$elemMatch": bson.M{"uid": cardUID}}}
-	err := wh.FindOne(c, filter).Decode(&card)
+	err := wh.FindOne(c, filter).Decode(&list)
 	if err != nil {
 		return nil, err
 	}
-	return &card, nil
+
+	for _, v := range list.Cards {
+		if v.UID == cardUID {
+			return &v, nil
+		}
+	}
+	return nil, ResourceNotFound
 }
 
 func combineIfExists(doc *bson.D, key string, val interface{}) {
