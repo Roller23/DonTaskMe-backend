@@ -159,3 +159,7 @@ func deleteFile(c *gin.Context) {
 
 	c.Writer.WriteHeader(http.StatusAccepted)
 }
+
+func getFile(c *gin.Context) {
+
+}
