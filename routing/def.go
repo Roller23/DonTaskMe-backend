@@ -34,6 +34,7 @@ func GetServer(mode string) *gin.Engine {
 	router.GET("/cards", getCards)
 	router.POST("/cards", addCard)
 	router.PUT("/cards/:card", updateCard)
+	router.PUT("/cards/move/:card", moveCard)
 	router.DELETE("/cards/:card", deleteCard)
 
 	router.POST("cards/:card/comment", addComment)
