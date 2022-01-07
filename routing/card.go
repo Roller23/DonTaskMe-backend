@@ -134,6 +134,41 @@ func updateCard(c *gin.Context) {
 	c.Writer.WriteHeader(http.StatusAccepted)
 }
 
+func moveCard(c *gin.Context) {
+	token := c.Query("token")
+	_, err := helpers.FindUserByToken(token)
+	if err == mongo.ErrNoDocuments {
+		c.JSON(http.StatusExpectationFailed, err)
+		return
+	} else if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	var updateReq model.CardMoveReq
+	err = c.ShouldBindJSON(&updateReq)
+	if err != nil {
+		log.Println("Inappropriate body")
+		c.Writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	cardUID := c.Param("card")
+	err = model.MoveCard(c, cardUID, &updateReq)
+
+	if err == model.ResourceNotFound {
+		log.Println("No such resource")
+		c.JSON(http.StatusBadRequest, err)
+		return
+	} else if err != nil {
+		log.Println(err.Error())
+		c.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.Writer.WriteHeader(http.StatusAccepted)
+}
+
 func deleteCard(c *gin.Context) {
 	token := c.Query("token")
 	_, err := helpers.FindUserByToken(token)

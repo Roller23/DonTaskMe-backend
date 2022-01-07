@@ -24,6 +24,10 @@ type CardUpdateReq struct {
 	Color       *string `json:"color,omitempty"`
 }
 
+type CardMoveReq struct {
+	ListUID string `json:"list_uid"`
+}
+
 type Card struct {
 	Title       string     `json:"title"`
 	Index       int        `json:"index"`
@@ -97,6 +101,46 @@ func UpdateCard(c context.Context, cardUID string, updateBody CardUpdateReq) err
 		return ResourceNotFound
 	}
 	return nil
+}
+
+func MoveCard(c context.Context, cardUID string, updateBody *CardMoveReq) error {
+	wh := service.DB.Collection(service.ListCollectionName)
+
+	toPull := bson.M{"cards": bson.M{"$elemMatch": bson.M{"uid": cardUID}}}
+	res, err := wh.UpdateOne(c, bson.D{}, toPull)
+	if err != nil {
+		return err
+	} else if res.ModifiedCount == 0 {
+		return ResourceNotFound
+	}
+
+	card, err := getCard(c, cardUID)
+	if err != nil {
+		return ResourceNotFound
+	}
+
+	err = DeleteCard(c, cardUID)
+	if err != nil {
+		return err
+	}
+
+	lh := service.DB.Collection(service.ListCollectionName)
+	_, err = lh.UpdateOne(c, bson.M{"uid": updateBody.ListUID}, bson.D{{"$push", bson.D{{"cards", card}}}})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func getCard(c context.Context, cardUID string) (*Card, error) {
+	wh := service.DB.Collection(service.ListCollectionName)
+	var card Card
+	filter := bson.M{"cards": bson.M{"$elemMatch": bson.M{"uid": cardUID}}}
+	err := wh.FindOne(c, filter).Decode(&card)
+	if err != nil {
+		return nil, err
+	}
+	return &card, nil
 }
 
 func combineIfExists(doc *bson.D, key string, val interface{}) {
