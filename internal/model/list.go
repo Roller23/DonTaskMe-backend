@@ -20,6 +20,11 @@ type List struct {
 	BoardUID string `json:"boardUid"`
 }
 
+type ListUpdateReq struct {
+	Title *string `json:"title,omitempty"`
+	Index *int    `json:"index,omitempty"`
+}
+
 func (l *ListReq) Save(c context.Context, boardUID string) (*List, error) {
 	UID, _ := nano.Nanoid()
 	newList := List{
@@ -61,6 +66,23 @@ func DeleteList(c context.Context, listUID string) error {
 	if err != nil {
 		return err
 	} else if res.DeletedCount == 0 {
+		return ResourceNotFound
+	}
+	return nil
+}
+
+func UpdateList(c context.Context, listUID string, req *ListUpdateReq) error {
+	lh := service.DB.Collection(service.ListCollectionName)
+	filter := bson.M{"uid": listUID}
+
+	var toSet bson.D
+	combineIfExists(&toSet, "title", req.Title)
+	combineIfExists(&toSet, "index", req.Index)
+	update := bson.D{{"$set", toSet}}
+	res, err := lh.UpdateOne(c, filter, update)
+	if err != nil {
+		return err
+	} else if res.ModifiedCount == 0 {
 		return ResourceNotFound
 	}
 	return nil

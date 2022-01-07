@@ -61,8 +61,6 @@ func addList(c *gin.Context) {
 		return
 	}
 
-	// TODO: check that only labradors can add list
-	// TODO: add constraint for index (not higher than previous one and all in natural order)
 	list, err := listReq.Save(c, boardUID)
 	if err != nil {
 		log.Println(err.Error())
@@ -86,8 +84,37 @@ func deleteList(c *gin.Context) {
 
 	listUID := c.Param("uid")
 
-	//TODO: check if in labradors or something
 	err = model.DeleteList(c, listUID)
+	if err == model.ResourceNotFound {
+		c.JSON(http.StatusBadRequest, err)
+	} else if err != nil {
+		c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	c.Writer.WriteHeader(http.StatusAccepted)
+}
+
+func updateList(c *gin.Context) {
+	token := c.Query("token")
+	_, err := helpers.FindUserByToken(token)
+	if err == mongo.ErrNoDocuments {
+		c.JSON(http.StatusExpectationFailed, err)
+		return
+	} else if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	var updateReq model.ListUpdateReq
+	err = c.ShouldBindJSON(&updateReq)
+	if err != nil {
+		log.Println("Inappropriate body")
+		c.Writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	listUID := c.Param("uid")
+	err = model.UpdateList(c, listUID, &updateReq)
 	if err == model.ResourceNotFound {
 		c.JSON(http.StatusBadRequest, err)
 	} else if err != nil {
