@@ -1,4 +1,4 @@
 # DonTaskMe-backend
 Backend for DonTaskMe
 
-Available at https://don-task-me.herokuapp.com/
+Available at https://dontaskme.fly.dev/
